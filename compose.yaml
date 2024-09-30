@@ -1,0 +1,32 @@
+services:
+  jellyfin:
+    image: docker.io/jellyfin/jellyfin:10.9.11
+    environment:
+      TZ: ${TZ}
+    ports:
+      - ${JELLYFIN_PORT:-8096}:8096
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./jellyfin/config
+        target: /config
+      - type: volume
+        source: jellyfin-cache
+        target: /cache
+      - type: bind
+        source: ${MEDIA_DIR}
+        target: /media
+        read_only: true
+
+  feishin:
+    image: ghcr.io/jeffvli/feishin:0.10.1
+    environment:
+      TZ: ${TZ}
+      SERVER_TYPE: jellyfin
+    ports:
+      - ${FEISHIN_PORT:-9180}:9180
+    restart: unless-stopped
+
+volumes:
+  jellyfin-cache:
+    driver: local
